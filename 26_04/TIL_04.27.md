@@ -53,3 +53,58 @@
 
     GameState/Playerontroller등을 파괴하지 않고 그대로 다음 맵으로 넘어가는 기능
     * 멀티 플레이 환경에서 주로 사용
+    
+---
+
+<h4>UI 위젯 설계와 실시간 데이터 연동하기</h4>
+
+* HUD(Heads-Up Display)
+
+    게임 내에서 플레이어에게 정보를 제공하기 위한 화면
+    * Canvas 기반 HUD
+        * AHUD 클래스를 상속하여 구현
+        * 기본적인 2D 그리기 작업
+    * UMG(Unreal Motion Graphics)
+        * WBP(Widget Blueprint 기반) 
+
+* WBP
+    * 보통 PlayerController에서 구현
+    * 생성
+        1. CreateWidget\<UUSerWidget>(this, HUDWidgetClass)
+        2. HUDWidget->AddtoViewport()
+
+* .bulid.cs
+
+    UBT(언리얼 빌드 툴)이 Cpp 모듈을 어떻게 빌드할지 읽는 설정 파일
+    * PublicDependencyModuleNames.AddRange에 "UMG" 추가 하여 위젯 관련 Cpp 코드 사용 가능
+
+* UI 연결
+    * 바인딩
+        * Tick 함수 사용하여 갱신
+    * SetText(Cpp)
+        * 필요할 때만 갱신 시점 조정 가능
+        * 순서
+            1. 컨트롤러 -> 사용하는 컨트롤러 가져오기
+            2. Widget 가져오기
+            3. 사용할 것 가져오기 현재는 UTextBlock
+                ```
+                Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Txt_Time")))
+                ```
+
+            4. SetText(FText::FormString::FString(Printf(TEXT(""))))로 초기화
+---
+
+<h4> 게임 흐름에 맞춘 메뉴 UI 구현하기</h4>
+
+* UI 입력
+    * SetInputMode(FInputModeUIOnly()): UI에 입력을 받는 모드로 변경
+    * bShowMouseCursor = true: 마우스가 보이도록 변경
+
+* 게임 입력
+    * SetInputMode(FInputModeGameOnly()): 게임에 입력을 받는 모드로 변경
+    * bShowMouseCursor = false: 마우스가 안보이도록 변경
+
+* UI 삭제
+    * HUDWidgetInstance->RemoveFromParent()
+
+        UI을 새로 생성하기 전 기존에 있을 수도 있는 UI 제거
